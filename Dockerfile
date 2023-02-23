@@ -1,0 +1,20 @@
+FROM python:3.10
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PROJECT_DIR=/usr/local/src/pgsql-backup
+WORKDIR ${PROJECT_DIR}
+
+RUN apt update && apt install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install pipenv
+
+COPY Pipfile* ${PROJECT_DIR}/
+
+RUN pipenv install --system --deploy
+
+COPY src ${PROJECT_DIR}/
+
+ENTRYPOINT ["/usr/local/bin/python"]
+CMD ["main.py"]
